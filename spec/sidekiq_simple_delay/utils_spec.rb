@@ -61,9 +61,9 @@ RSpec.describe SidekiqSimpleDelay::Utils do
 
   context 'user objects' do
     before(:each) do
-      [
-        :user_simple_objects,
-        :simple_complex_objects
+      %i[
+        user_simple_objects
+        simple_complex_objects
       ].each do |ivar|
         str = "@#{ivar}"
 
