@@ -12,13 +12,23 @@ module SidekiqSimpleDelay
           TrueClass,
           FalseClass,
           String,
-          Float,
-          Integer,
           Symbol,
           Array,
           Hash
         ]
       )
+
+      def numeric_simple_objects
+        return @numeric_simple_objects if defined? @numeric_simple_objects
+
+        version = Gem::Version.new(RUBY_VERSION)
+        @numeric_simple_objects =
+          if version >= Gem::Version.new('2.4.0')
+            Set.new([Integer, Float])
+          else
+            Set.new([Fixnum, Bignum, Float])
+          end
+      end
 
       def user_simple_objects
         @user_simple_objects ||= Set.new
@@ -64,6 +74,8 @@ module SidekiqSimpleDelay
           end
           true
         elsif SYSTEM_SIMPLE_CLASSES.include?(klass)
+          true
+        elsif numeric_simple_objects.include?(klass)
           true
         elsif user_simple_objects.include?(klass)
           true
