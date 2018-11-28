@@ -16,17 +16,18 @@ module SidekiqSimpleDelay
           Array,
           Hash
         ]
-      )
+      ).freeze
 
       def numeric_simple_objects
         return @numeric_simple_objects if defined? @numeric_simple_objects
 
-        version = Gem::Version.new(RUBY_VERSION)
+        ruby_version = Gem::Version.new(RUBY_VERSION)
+
         @numeric_simple_objects =
-          if version >= Gem::Version.new('2.4.0')
-            Set.new([Integer, Float])
+          if ruby_version >= Gem::Version.new('2.4.0')
+            Set.new([Integer, Float]).freeze
           else
-            Set.new([Fixnum, Bignum, Float])
+            Set.new([Fixnum, Bignum, Float]).freeze
           end
       end
 
