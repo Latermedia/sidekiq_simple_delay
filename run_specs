@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+bundle exec rspec spec --tag ~enable_delay:true
+bundle exec rspec spec --tag enable_delay:true

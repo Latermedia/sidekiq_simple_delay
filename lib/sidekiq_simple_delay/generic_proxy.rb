@@ -11,36 +11,49 @@ module SidekiqSimpleDelay
       @opts = options
     end
 
-    def simple_delayable_instance?
-      return false unless @target.respond_to?(:initialize_args)
-
-      true
-    end
-
     def method_missing(name, *args)
       worker_args = {
         'm' => name,
         'm_args' => args
       }
 
+      # check to make sure there are no keyword or block args
       method_args_sig = @target.method(name).parameters
 
       num_req_key_args = method_args_sig.select { |p| p[0] == :keyreq }.length
       num_opt_key_args = method_args_sig.select { |p| p[0] == :key }.length
+      num_var_key_args = method_args_sig.select { |p| p[0] == :keyrest }.length
 
-      raise ::ArgumentError, 'Cannont delay methods with named arguments' if num_req_key_args > 0 || num_opt_key_args > 0
+      uses_keyword_args = num_req_key_args > 0 || num_opt_key_args > 0 || num_var_key_args > 0
+      raise ::ArgumentError, 'Cannont delay methods with named arguments' if uses_keyword_args
 
+      num_block_args = method_args_sig.select { |p| p[0] == :block }.length
+      raise ArgumentError, 'Cannont delay methods with named block argument' if num_block_args > 0
+
+      # Calling class methods is always good
       if @target.class == ::Class
         worker_args['target_klass'] = @target.name
-      else
-        raise ::ArgumentError, "Unable to simple delay objects of type #{@target.class}" unless simple_delayable_instance?
-
+      # If this is an instance, it has to tell us what the args we would use
+      # to reinialize it in the worker, if `new` takes no args, that is also ok
+      elsif @target.respond_to?(:initialize_args) ||
+            @target.method(:initialize).arity == 0
         worker_args['target_klass'] = @target.class.name
-        # verify it works with arrays, hashes, named arguments,
+        # Verify it works with arrays, hashes, named arguments,
         # and lists of arguments
-        worker_args['init_args'] = @target.initialize_args
+        # These args will be passed to `simple_delay_initialize` if defined
+        # or new otherwise
+        worker_args['init_args'] =
+          if @target.respond_to?(:initialize_args)
+            @target.initialize_args
+          else
+            []
+          end
+      # This is an instance of a class that is not simple delay compatible
+      else
+        raise ::ArgumentError, "Unable to simple delay objects of type #{@target.class}"
       end
 
+      # the args have to be simple and convertable to JSON
       raise ::ArgumentError, 'args are not simple, can not use simple_delay' unless Utils.simple_object?(worker_args)
 
       @performable.client_push({ 'class' => @performable, 'args' => [worker_args] }.merge(@opts))

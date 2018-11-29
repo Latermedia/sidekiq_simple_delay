@@ -2,7 +2,7 @@
 
 require 'sidekiq_simple_delay/utils'
 
-class User
+class UtilsTest
 end
 
 RSpec.describe SidekiqSimpleDelay::Utils do
@@ -44,11 +44,11 @@ RSpec.describe SidekiqSimpleDelay::Utils do
 
       context 'invalid' do
         it 'non-simple' do
-          expect(utils.simple_object?(User.new)).to eq(false)
+          expect(utils.simple_object?(UtilsTest.new)).to eq(false)
         end
 
         it 'non-simple - class' do
-          expect(utils.simple_object?(User)).to eq(false)
+          expect(utils.simple_object?(UtilsTest)).to eq(false)
         end
       end
     end
@@ -65,12 +65,12 @@ RSpec.describe SidekiqSimpleDelay::Utils do
 
       context 'invalid' do
         it 'array' do
-          expect(utils.simple_object?([2, 'things', User.new])).to eq(false)
+          expect(utils.simple_object?([2, 'things', UtilsTest.new])).to eq(false)
         end
 
         it 'hash' do
           arg = {
-            'things' => User.new
+            'things' => UtilsTest.new
           }
           expect(utils.simple_object?(arg)).to eq(false)
         end
