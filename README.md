@@ -42,7 +42,7 @@ class User
   extend SidekiqSimpleDelay::DelayMethods
 
   def self.greeting
-  	'Hello Everyone'
+    'Hello Everyone'
   end
 end
 
@@ -57,7 +57,7 @@ class User
   include SidekiqSimpleDelay::DelayMethods
 
   def greeting(name)
-  	"Hello, #{name}"
+    "Hello, #{name}"
   end
 end
 
@@ -82,7 +82,7 @@ Let's say we have a class the contains a long running method that we want to pus
 ```ruby
 class Task
   def self.long_running_task(task_arg1, task_arg2)
-  	# things that take a long time...
+    # things that take a long time...
   end
 end
 ```
@@ -120,17 +120,17 @@ One use case of these methods would be for delaying methods on an `ActiveRecord`
 ```ruby
 class ApplicationRecord < ActiveRecord::Base
   def initialize_args
-  	[id]
+    [id]
   end
 
   def self.simple_delay_initialize(*args)
-  	find(args[0])
+    find(args[0])
   end
 end
 
 class User < ApplicationRecord
   def long_running_user_task(arg1)
-  	# takes a long time
+    # takes a long time
   end
 end
 ```
