@@ -3,9 +3,8 @@
 require 'sidekiq_simple_delay/utils'
 
 module SidekiqSimpleDelay
-  class Proxy < BasicObject
-    include ::Kernel # to be able to raise
-
+  # Simple proxy object that handles enqueuing delay workers via `method_missing`
+  class Proxy < Object
     def initialize(performable, target, options = {})
       @performable = performable
       @target = target

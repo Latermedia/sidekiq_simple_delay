@@ -4,8 +4,8 @@ require 'sidekiq'
 require 'sidekiq_simple_delay/utils'
 require 'sidekiq_simple_delay/generic_proxy'
 
-# Sidekiq delay functionality with some restrictions
 module SidekiqSimpleDelay
+  # Sidekiq delay functionality with some restrictions
   class SimpleDelayedWorker
     include Sidekiq::Worker
 
@@ -30,6 +30,7 @@ module SidekiqSimpleDelay
     end
   end
 
+  # Aliased class methods to be added to Class
   module Klass
     def simple_sidekiq_delay(options = {})
       Proxy.new(SimpleDelayedWorker, self, options)

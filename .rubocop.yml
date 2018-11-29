@@ -17,3 +17,9 @@ Style/NumericPredicate:
 # to support Ruby 2.2 & 2.3
 Lint/UnifiedInteger:
   Enabled: false
+
+Style/MethodMissingSuper:
+  Enabled: false
+
+Style/MissingRespondToMissing:
+  Enabled: false
