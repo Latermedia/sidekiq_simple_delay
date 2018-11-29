@@ -26,7 +26,16 @@ spec_shared: &spec_shared
                           --format RspecJunitFormatter \
                           --out /tmp/test-results/rspec-basic.xml \
                           --format progress \
-                          spec
+                          spec --tag ~enable_delay:true
+
+    - run:
+        name: Run enable_delay specs
+        command: |
+          bundle exec rspec --format progress \
+                          --format RspecJunitFormatter \
+                          --out /tmp/test-results/rspec-basic.xml \
+                          --format progress \
+                          spec --tag enable_delay:true
 
     # collect reports
     - store_test_results:
