@@ -135,7 +135,10 @@ class User < ApplicationRecord
 end
 ```
 
+From the console:
 ```ruby
+SidekiqSimpleDelay.enable_delay_instance!(User)
+
 User.where(column1: true).find_each do |user|
   user.simple_delay.long_running_user_task('things')
 end
