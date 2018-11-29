@@ -5,7 +5,7 @@ require 'sidekiq_simple_delay/utils'
 require 'sidekiq_simple_delay/generic_proxy'
 
 module SidekiqSimpleDelay
-  # Sidekiq delay functionality with some restrictions
+  # Worker that handles the delayed functionality
   class SimpleDelayedWorker
     include Sidekiq::Worker
 
