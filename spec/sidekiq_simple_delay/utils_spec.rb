@@ -1,17 +1,6 @@
 # frozen_string_literal: true
 
-class User
-end
-
-class ComplexUser
-  def initialize(subs)
-    @subs = subs
-  end
-
-  def each
-    @subs.each { |s| yield s }
-  end
-end
+require 'sidekiq_simple_delay/utils'
 
 RSpec.describe SidekiqSimpleDelay::Utils do
   let(:utils) { SidekiqSimpleDelay::Utils }
@@ -42,6 +31,10 @@ RSpec.describe SidekiqSimpleDelay::Utils do
         expect(utils.simple_object?(123)).to eq(true)
       end
 
+      it 'big integer' do
+        expect(utils.simple_object?(99_999_999_999_999_999_999)).to eq(true)
+      end
+
       it 'symbol' do
         expect(utils.simple_object?(:things)).to eq(true)
       end
@@ -56,57 +49,6 @@ RSpec.describe SidekiqSimpleDelay::Utils do
         hash = { things: 1234, 23 => 'things' }
         expect(utils.simple_object?(hash)).to eq(true)
       end
-    end
-  end
-
-  context 'user objects' do
-    before(:each) do
-      %i[
-        user_simple_objects
-        simple_complex_objects
-      ].each do |ivar|
-        str = "@#{ivar}"
-
-        next unless utils.instance_variable_defined?(str)
-
-        utils.remove_instance_variable(str)
-      end
-    end
-
-    it 'rejects User' do
-      expect(utils.simple_object?(User.new)).to eq(false)
-    end
-
-    it 'accepts User' do
-      utils.register_simple_object(User)
-
-      expect(utils.simple_object?(User.new)).to eq(true)
-    end
-
-    it 'accepts ComplexUser' do
-      utils.register_simple_object(ComplexUser)
-      user = ComplexUser.new([:things, 1])
-
-      expect(utils.simple_object?(user)).to eq(true)
-    end
-
-    it 'rejects ComplexUser with User sub' do
-      utils.register_simple_object(ComplexUser)
-      user = ComplexUser.new([User.new, 1])
-
-      expect(utils.simple_object?(user)).to eq(false)
-    end
-
-    it 'rejects ComplexUser' do
-      expect(utils.simple_object?(User.new)).to eq(false)
-    end
-
-    it 'accepts ComplexUser with User sub' do
-      utils.register_simple_object(ComplexUser)
-      utils.register_simple_object(User)
-      user = ComplexUser.new([User.new, 1])
-
-      expect(utils.simple_object?(user)).to eq(true)
     end
   end
 end
