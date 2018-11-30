@@ -22,8 +22,8 @@ module SidekiqSimpleDelay
           target_klass
         end
 
-      method_name = args['method']
-      method_args = args['method_args']
+      method_name = args['m']
+      method_args = args['args']
 
       target.__send__(method_name, *method_args)
     end

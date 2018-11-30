@@ -13,8 +13,8 @@ module SidekiqSimpleDelay
 
     def method_missing(name, *args)
       worker_args = {
-        'method' => name,
-        'method_args' => args
+        'm' => name,
+        'args' => args
       }
 
       # check to make sure there are no keyword or block args
@@ -48,7 +48,8 @@ module SidekiqSimpleDelay
           end
       else
         # This is an instance of a class that is not simple delay compatible
-        raise ArgumentError, "Unable to simple delay objects of class #{@target.class}"
+        raise ArgumentError, "Objects of class #{@target.class} must implement " +
+          "#initialize_args or be calling a method with an arity of 0 to be delayed"
       end
 
       # the args have to be simple and convertable to JSON
