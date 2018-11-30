@@ -9,7 +9,7 @@ module SidekiqSimpleDelay
     include Sidekiq::Worker
 
     def perform(args)
-      target_klass = Object.const_get(args['target_klass'])
+      target_klass = Object.const_get(args.fetch('target_klass'))
 
       target =
         if args.key?('init_args')
@@ -22,8 +22,8 @@ module SidekiqSimpleDelay
           target_klass
         end
 
-      method_name = args['m']
-      method_args = args['m_args']
+      method_name = args['method']
+      method_args = args['method_args']
 
       target.__send__(method_name, *method_args)
     end

@@ -34,10 +34,7 @@ module SidekiqSimpleDelay
         klass = obj.class
 
         if SYSTEM_SIMPLE_COMPLEX_CLASSES.include?(klass)
-          obj.each do |o|
-            return false unless simple_object?(o)
-          end
-          true
+          obj.all? { |o| simple_object?(o) }
         elsif SYSTEM_SIMPLE_CLASSES.include?(klass)
           true
         elsif SYSTEM_SIMPLE_NUMERIC_CLASSES.include?(klass)
