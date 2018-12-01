@@ -13,14 +13,14 @@ module SidekiqSimpleDelay
 
     # Adds simple_delay class methods to klass
     def enable_delay_class!(klass)
-      raise ::ArgumentError, 'klass must be a Class' if klass.class != Class
+      raise ArgumentError, 'klass must be a Class' unless klass.class.is_a?(Class)
 
       klass.__send__(:extend, SidekiqSimpleDelay::DelayMethods)
     end
 
     # Adds simple_delay instance methods to klass
     def enable_delay_instance!(klass)
-      raise ::ArgumentError, 'klass must be a Class' if klass.class != Class
+      raise ArgumentError, 'klass must be a Class' unless klass.class.is_a?(Class)
 
       klass.__send__(:include, SidekiqSimpleDelay::DelayMethods)
     end

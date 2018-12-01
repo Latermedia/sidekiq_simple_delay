@@ -14,32 +14,30 @@ module SidekiqSimpleDelay
     def method_missing(name, *args)
       worker_args = {
         'm' => name,
-        'm_args' => args
+        'args' => args
       }
 
       # check to make sure there are no keyword or block args
       method_args_sig = @target.method(name).parameters
 
-      num_req_key_args = method_args_sig.select { |p| p[0] == :keyreq }.length
-      num_opt_key_args = method_args_sig.select { |p| p[0] == :key }.length
-      num_var_key_args = method_args_sig.select { |p| p[0] == :keyrest }.length
+      num_req_key_args = method_args_sig.count { |p| p[0] == :keyreq }
+      num_opt_key_args = method_args_sig.count { |p| p[0] == :key }
+      num_var_key_args = method_args_sig.count { |p| p[0] == :keyrest }
 
       uses_keyword_args = num_req_key_args > 0 || num_opt_key_args > 0 || num_var_key_args > 0
-      raise ::ArgumentError, 'Cannont delay methods with named arguments' if uses_keyword_args
+      raise ArgumentError, 'Cannot delay methods with named arguments' if uses_keyword_args
 
       num_block_args = method_args_sig.select { |p| p[0] == :block }.length
-      raise ArgumentError, 'Cannont delay methods with named block argument' if num_block_args > 0
+      raise ArgumentError, 'Cannot delay methods with named block argument' if num_block_args > 0
 
-      # Calling class methods is always good
-      if @target.class == ::Class
+      # Calling class methods is always permitted
+      if @target.is_a?(Class)
         worker_args['target_klass'] = @target.name
-      # If this is an instance, it has to tell us what the args we would use
-      # to reinialize it in the worker, if `new` takes no args, that is also ok
-      elsif @target.respond_to?(:initialize_args) ||
-            @target.method(:initialize).arity == 0
+      # If this is an instance, it has to tell us what args we would use
+      # to reinitialize it in the worker. If `#new` takes no args, that is also ok
+      elsif @target.respond_to?(:initialize_args) || @target.method(:initialize).arity == 0
         worker_args['target_klass'] = @target.class.name
-        # Verify it works with arrays, hashes, named arguments,
-        # and lists of arguments
+        # Verify it works with arrays, hashes, named arguments, and lists of arguments
         # These args will be passed to `simple_delay_initialize` if defined
         # or new otherwise
         worker_args['init_args'] =
@@ -48,13 +46,14 @@ module SidekiqSimpleDelay
           else
             []
           end
-      # This is an instance of a class that is not simple delay compatible
       else
-        raise ::ArgumentError, "Unable to simple delay objects of type #{@target.class}"
+        # This is an instance of a class that is not simple delay compatible
+        raise ArgumentError, "Objects of class #{@target.class} must implement " \
+                             '#initialize_args or be calling a method with an arity of 0 to be delayed'
       end
 
       # the args have to be simple and convertable to JSON
-      raise ::ArgumentError, 'args are not simple, can not use simple_delay' unless Utils.simple_object?(worker_args)
+      raise ArgumentError, 'args are not serializable, cannot use simple_delay' unless Utils.simple_object?(worker_args)
 
       @performable.client_push({ 'class' => @performable, 'args' => [worker_args] }.merge(@opts))
     end

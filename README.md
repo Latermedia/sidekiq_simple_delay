@@ -2,7 +2,7 @@
 
 Adds Sidekiq [Delay](https://github.com/mperham/sidekiq/wiki/Delayed-extensions) functionality, but adds some restrictions to prevent object marshalling.
 
-Sidekiq's built-in delay feature only allows you to turn the functionality for all classes and only for class methods. `SidekiqSimpleDelay` allows you to specify classes you want to enable the delay methods for. In addition to class methods, since we are now checking and restricting the arguments to be simple JSON converable objects, we can add this delay functionality to instances of classes.
+Sidekiq's built-in delay feature only allows you to turn the functionality for all classes and only for class methods. `SidekiqSimpleDelay` allows you to specify classes you want to enable the delay methods for. In addition to class methods, since we are now checking and restricting the arguments to be simple JSON convertable objects, we can add this delay functionality to instances of classes.
 
 ## Installation
 
@@ -75,9 +75,9 @@ Three methods are provided that map to the three main invocations for Sidekiq.
 
 ### Devops
 
-A few convenience are provided that allow you enable this functionality from the command line.
+A few conveniences are provided that allow you enable this functionality from the command line.
 
-Let's say we have a class the contains a long running method that we want to push the the background. In the past we'd have to make a one time worker to run this job. Now we can create the job directly from our console without modifying the class's code.
+Let's say we have a class the contains a long running method that we want to push to the background. In the past we'd have to make a one time worker to run this job. Now we can create the job directly from our console without modifying the class's code.
 
 ```ruby
 class Task
@@ -94,9 +94,9 @@ SidekiqSimpleDelay.enable_delay_class!(Task)
 Task.simple_delay.long_running_task('things', 1234)
 ```
 
-The great thing is, assuming you have added `sidekiq_simple_delay` to your `Gemfile`, this will just work. The job that is enqueued doesn't need `Task` to know anything about Sidekiq, workers, or jobs.
+The great thing is, assuming you have added `sidekiq_simple_delay` to your `Gemfile`, this will just work™. The job that is enqueued doesn't need `Task` to know anything about Sidekiq, workers, or jobs.
 
-Simialr to `enable_delay_class!` there is also `enable_delay_instance!` to do the same thing for intances and instance methods of `Task`.
+Similar to `enable_delay_class!` there is also `enable_delay_instance!` to do the same thing for instances and instance methods of `Task`.
 
 ```ruby
 SidekiqSimpleDelay.enable_delay_instance!(Task)
@@ -162,7 +162,7 @@ end
 
 `SidekiqSimpleDelay::Utils.simple_object?` will do a depth first recursive check to make sure nothing but the above makes it into the arguments.
 
-In addition requiring arguments being simple, a requirement of no keyword or block arguments is imposed. There is a chance the keyword argument restriction could be lifted, but this would take a fair bit of work in `SimpleDelayedWorker` to get working correctly. For now the restriction is there to keep one from shooting themselves inthe foot.
+In addition requiring arguments being simple, a requirement of no keyword or block arguments is imposed. There is a chance the keyword argument restriction could be lifted, but this would take a fair bit of work in `SimpleDelayedWorker` to get working correctly. For now the restriction is there to keep one from shooting themselves in the foot.
 
 ## Development
 
