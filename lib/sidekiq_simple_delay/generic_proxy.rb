@@ -48,8 +48,8 @@ module SidekiqSimpleDelay
           end
       else
         # This is an instance of a class that is not simple delay compatible
-        raise ArgumentError, "Objects of class #{@target.class} must implement " +
-          "#initialize_args or be calling a method with an arity of 0 to be delayed"
+        raise ArgumentError, "Objects of class #{@target.class} must implement " \
+                             '#initialize_args or be calling a method with an arity of 0 to be delayed'
       end
 
       # the args have to be simple and convertable to JSON
