@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 require 'sidekiq'
-require 'sidekiq_simple_delay/generic_proxy'
 
 module SidekiqSimpleDelay
-  # Worker that handles the delayed functionality
+  # Worker that handles the simple_delayed functionality
   class SimpleDelayedWorker
     include Sidekiq::Worker
 

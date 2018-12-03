@@ -49,6 +49,8 @@ end
 # ...
 
 User.simple_delay.greeting
+User.simple_delay_for(10.minutes).greeting
+User.simple_delay_until(1.day.from_now).greeting
 ```
 
 To add delay functionality to the instances of a class:
