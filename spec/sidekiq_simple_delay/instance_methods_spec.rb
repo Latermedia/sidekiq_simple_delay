@@ -283,7 +283,7 @@ RSpec.describe SidekiqSimpleDelay do
     context 'simple_delay_spread' do
       before(:each) do
         time_str = '2018-12-03 16:03:28 -0800'
-        @time_f = 1543881808.0
+        @time_f = 1_543_881_808.0
 
         allow(Time).to receive(:now).and_return(Time.parse(time_str))
       end
@@ -377,7 +377,7 @@ RSpec.describe SidekiqSimpleDelay do
 
           opts = {
             spread_method: :mod,
-            spread_mod_value: 12345
+            spread_mod_value: 12_345
           }
 
           obj.simple_delay_spread(opts).method1
@@ -386,7 +386,7 @@ RSpec.describe SidekiqSimpleDelay do
         it 'should enqueue a job based on spread_mod_method' do
           obj = ValidSimpleObject.new
 
-          allow(obj).to receive(:get_my_mod_value).and_return(54321)
+          allow(obj).to receive(:get_my_mod_value).and_return(54_321)
 
           proxy_opts = {
             'at' => @time_f + 321.0
@@ -404,7 +404,7 @@ RSpec.describe SidekiqSimpleDelay do
         it 'should enqueue a job based on spread_mod_method method' do
           obj = ValidSimpleObject.new
 
-          allow(obj).to receive(:get_my_mod_value).and_return(654321)
+          allow(obj).to receive(:get_my_mod_value).and_return(654_321)
           allow(obj).to receive(:spread_mod_method).and_return(:get_my_mod_value)
 
           proxy_opts = {
