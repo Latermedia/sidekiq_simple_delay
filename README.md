@@ -75,6 +75,31 @@ Three methods are provided that map to the three main invocations for Sidekiq.
 * `simple_delay_for` -> `perform_in`
 * `simple_delay_until` -> `perform_at`
 
+### Simple Delay Spread
+
+Often we want to enqueue a bunch of jobs, but need to spread them out over some period of time to prevent swampping our resources. We use a similar API to [`sidekiq_spread`](https://github.com/Latermedia/sidekiq_spread) to evenly distribute job execution.
+
+```ruby
+class User
+  extend SidekiqSimpleDelay::DelayMethods
+
+  def greeting(name)
+    "Hello, #{name}"
+  end
+end
+
+# ...
+
+spread_options = {
+  spread_duration: 3.hours,
+  spread_in: 15.minutes
+}
+
+# Randomly enqueues a job sometime between 15 minutes and 3 hours
+# and 15 minutes from now
+User.simple_delay_spread(spread_options).greeting('Les')
+```
+
 ### Devops
 
 A few conveniences are provided that allow you enable this functionality from the command line.
@@ -122,7 +147,7 @@ One use case of these methods would be for delaying methods on an `ActiveRecord`
 ```ruby
 class ApplicationRecord < ActiveRecord::Base
   def initialize_args
-    [id]
+    [send(self.class.primary_key)]
   end
 
   def self.simple_delay_initialize(*args)
@@ -145,6 +170,22 @@ User.where(column1: true).find_each do |user|
   user.simple_delay.long_running_user_task('things')
 end
 ```
+
+To spread these jobs out over an interval of time:
+```ruby
+  spread_options = {
+    spread_duration: 8.hours,
+    spread_at: 3.hours.from_now,
+    spread_method: :mod,
+    spread_mod_method: :id
+  }
+
+  User.where(column1: true).find_each do |user|
+    user.simple_delay_spread(spread_options).long_running_user_task('things')
+  end
+```
+
+By modding on the id of the `User` object, we can be sure that if we run this script with the same options, each user job will be executed at about the same relative time. This is useful if you have recurring jobs where having a deterministic offset for a user is beneficial.
 
 ### Simple Objects
 

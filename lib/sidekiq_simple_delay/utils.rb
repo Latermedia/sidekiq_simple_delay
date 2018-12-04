@@ -30,6 +30,7 @@ module SidekiqSimpleDelay
           Set.new([Fixnum, Bignum, Float]).freeze
         end
 
+      # @private
       def simple_object?(obj)
         klass = obj.class
 
@@ -42,6 +43,17 @@ module SidekiqSimpleDelay
         else
           false
         end
+      end
+
+      # @private
+      def extract_option(opts, arg, default = nil)
+        [arg.to_sym, arg.to_s].each do |a|
+          next unless opts.key?(a)
+
+          return opts.delete(a)
+        end
+
+        default
       end
     end
   end

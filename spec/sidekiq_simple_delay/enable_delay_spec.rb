@@ -25,5 +25,10 @@ RSpec.describe SidekiqSimpleDelay, enable_delay: true do
       expect(ClassDelayTest.respond_to?(:simple_delay_until)).to eq(true)
       expect(ClassDelayTest.new.respond_to?(:simple_delay_until)).to eq(false)
     end
+
+    it 'simple_delay_spread' do
+      expect(ClassDelayTest.respond_to?(:simple_delay_spread)).to eq(true)
+      expect(ClassDelayTest.new.respond_to?(:simple_delay_spread)).to eq(false)
+    end
   end
 end

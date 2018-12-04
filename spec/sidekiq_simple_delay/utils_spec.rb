@@ -76,5 +76,43 @@ RSpec.describe SidekiqSimpleDelay::Utils do
         end
       end
     end
+
+    context 'extract_spread_options' do
+      it 'should extract option - symbol' do
+        opts = { a: 1, b: 2 }
+        opt = utils.extract_option(opts, :a)
+
+        expect(opt).to eq(1)
+        expect(opts.length).to eq(1)
+        expect(opts.key?(:a)).to eq(false)
+      end
+
+      it 'should extract option - string' do
+        opts = { a: 1, b: 2 }
+        opt = utils.extract_option(opts, 'a')
+
+        expect(opt).to eq(1)
+        expect(opts.length).to eq(1)
+        expect(opts.key?(:a)).to eq(false)
+      end
+
+      it 'should extract option - default' do
+        opts = { a: 1, b: 2 }
+        opt = utils.extract_option(opts, :c, 3)
+
+        expect(opt).to eq(3)
+        expect(opts.length).to eq(2)
+        expect(opts.key?(:a)).to eq(true)
+      end
+
+      it 'should extract option - nil' do
+        opts = { a: 1, b: 2 }
+        opt = utils.extract_option(opts, :c)
+
+        expect(opt).to eq(nil)
+        expect(opts.length).to eq(2)
+        expect(opts.key?(:a)).to eq(true)
+      end
+    end
   end
 end
