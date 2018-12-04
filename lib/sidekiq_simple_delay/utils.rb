@@ -55,6 +55,16 @@ module SidekiqSimpleDelay
 
         default
       end
+
+      if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.3.0')
+        def random_number(duration)
+          SecureRandom.random_number(duration)
+        end
+      else
+        def random_number(duration)
+          rand * duration
+        end
+      end
     end
   end
 end

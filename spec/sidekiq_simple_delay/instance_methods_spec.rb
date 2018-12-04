@@ -319,7 +319,7 @@ RSpec.describe SidekiqSimpleDelay do
       context 'rand' do
         before(:each) do
           @rand_val = 5
-          allow(SecureRandom).to receive(:random_number).and_return(@rand_val)
+          allow(SidekiqSimpleDelay::Utils).to receive(:random_number).and_return(@rand_val)
         end
 
         it 'should enqueue within the next hour' do

@@ -63,7 +63,7 @@ module SidekiqSimpleDelay
         else
           case spread_method.to_sym
           when :rand
-            SecureRandom.random_number(spread_duration)
+            Utils.random_number(spread_duration)
           when :mod
             mod_value =
               # The mod value has been supplied
