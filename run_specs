@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 
-bundle exec rspec spec --tag ~enable_delay:true
-bundle exec rspec spec --tag enable_delay:true
+bundle exec rspec spec --tag ~run_tag
+bundle exec rspec spec --tag run_tag:enable_delay
+bundle exec rspec spec --tag run_tag:active_record_base
+bundle exec rspec spec --tag run_tag:application_record
