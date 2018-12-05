@@ -15,6 +15,10 @@ module SidekiqSimpleDelay
       ActiveSupport.on_load(:active_record) do
         SidekiqSimpleDelay.enable_delay_active_record!
       end
+
+      ActiveSupport.on_load(:action_mailer) do
+        SidekiqSimpleDelay.enable_delay_application_mailer!
+      end
     end
 
     # Adds simple_delay class methods to a class
@@ -63,6 +67,32 @@ module SidekiqSimpleDelay
       return if klass.included_modules.include?(SidekiqSimpleDelay::ActiveRecord)
 
       klass.__send__(:include, SidekiqSimpleDelay::ActiveRecord)
+    end
+
+    # Adds simple_delay functionality to ActionMailer objects. Attempts to add to {ApplicationMailer} first,
+    # the falls back to adding to {ActionMailer::Base}.
+    #
+    # @param klass [Class] Class to add simple_delay functionality to. Must inherit from {ActionMailer::Base}.
+    def enable_delay_application_mailer!(klass = nil)
+      klass =
+        if !klass.nil?
+          klass
+        elsif defined?(::ApplicationMailer)
+          ::ApplicationMailer
+        elsif defined?(::ActionMailer::Base)
+          ::ActionMailer::Base
+        end
+
+      raise ArgumentError, 'klass must be supplied' if klass.nil?
+      raise ArgumentError, 'klass must be a class' unless klass.class.is_a?(Class)
+      raise ArgumentError, 'klass must inherit from ActionMailer::Base' unless klass.ancestors.any? { |c| c.name == 'ActionMailer::Base' }
+
+      ar_file = 'sidekiq_simple_delay/extensions/action_mailer'
+      require ar_file unless defined? SidekiqSimpleDelay::ActionMailer
+
+      return if klass.included_modules.include?(SidekiqSimpleDelay::ActionMailer)
+
+      klass.__send__(:include, SidekiqSimpleDelay::ActionMailer)
     end
   end
 end

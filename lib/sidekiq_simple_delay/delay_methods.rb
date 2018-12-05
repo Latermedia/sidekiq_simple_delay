@@ -10,7 +10,7 @@ module SidekiqSimpleDelay
     #
     # @param options [Hash] options similar to Sidekiq's `perform_async`
     def simple_sidekiq_delay(options = {})
-      Proxy.new(SimpleDelayedWorker, self, options)
+      Proxy.new(simple_delayed_worker, self, options)
     end
 
     # Enqueue a job to handle the delayed action after an elapsed interval
@@ -19,7 +19,7 @@ module SidekiqSimpleDelay
     #   this argument to convert to seconds.
     # @param options [Hash] options similar to Sidekiq's `perform_in`
     def simple_sidekiq_delay_for(interval, options = {})
-      Proxy.new(SimpleDelayedWorker, self, options.merge('at' => Time.now.to_f + interval.to_f))
+      Proxy.new(simple_delayed_worker, self, options.merge('at' => Time.now.to_f + interval.to_f))
     end
 
     # Enqueue a job to handle the delayed action after at a certain time
@@ -28,7 +28,12 @@ module SidekiqSimpleDelay
     #   this argument to convert to a timestamp.
     # @param options [Hash] options similar to Sidekiq's `perform_at`
     def simple_sidekiq_delay_until(timestamp, options = {})
-      Proxy.new(SimpleDelayedWorker, self, options.merge('at' => timestamp.to_f))
+      Proxy.new(simple_delayed_worker, self, options.merge('at' => timestamp.to_f))
+    end
+
+    # Tell {DelayMethods} which delayed worker to use
+    def simple_delayed_worker
+      SimpleDelayedWorker
     end
 
     alias simple_delay simple_sidekiq_delay
