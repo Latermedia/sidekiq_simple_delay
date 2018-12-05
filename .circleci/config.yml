@@ -26,7 +26,7 @@ spec_shared: &spec_shared
                           --format RspecJunitFormatter \
                           --out /tmp/test-results/rspec-basic.xml \
                           --format progress \
-                          spec --tag ~enable_delay:true
+                          spec --tag ~run_tag
 
     - run:
         name: Run enable_delay specs
@@ -35,8 +35,34 @@ spec_shared: &spec_shared
                           --format RspecJunitFormatter \
                           --out /tmp/test-results/rspec-basic.xml \
                           --format progress \
-                          spec --tag enable_delay:true
+                          spec --tag run_tag:enable_delay
 
+    - run:
+        name: Run active_record_base specs
+        command: |
+          bundle exec rspec --format progress \
+                          --format RspecJunitFormatter \
+                          --out /tmp/test-results/rspec-basic.xml \
+                          --format progress \
+                          spec --tag run_tag:active_record_base
+
+    - run:
+        name: Run application_record specs
+        command: |
+          bundle exec rspec --format progress \
+                          --format RspecJunitFormatter \
+                          --out /tmp/test-results/rspec-basic.xml \
+                          --format progress \
+                          spec --tag run_tag:application_record
+
+    - run:
+        name: Run active_record_single specs
+        command: |
+          bundle exec rspec --format progress \
+                          --format RspecJunitFormatter \
+                          --out /tmp/test-results/rspec-basic.xml \
+                          --format progress \
+                          spec --tag run_tag:active_record_single
     # collect reports
     - store_test_results:
         path: /tmp/test-results
