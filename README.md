@@ -146,6 +146,18 @@ User.where(column1: true).find_each do |user|
 end
 ```
 
+In fact, this is exactly what `sidekiq_delay` does with its `ActiveRecord` integration. To enable it,
+
+```ruby
+SidekiqSimpleDelay.enable_delay_active_record!
+```
+
+This will try to add the methods to `ApplicationRecord` first if it exists, but falls back to `ActiveRecord::Base` if it doesn't. You can also add it a single class if you want.
+
+```ruby
+SidekiqSimpleDelay.enable_delay_active_record!(User)
+```
+
 ### Simple Objects
 
 `SidekiqSimpleDelay` only allows simple objects to be used as parameters to the delayed method. These objects are:
