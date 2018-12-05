@@ -36,4 +36,48 @@ RSpec.describe SidekiqSimpleDelay, run_tag: :application_mailer do
       expect(MailerOtherKlass.simple_delayed_worker).to eq(SidekiqSimpleDelay::SimpleDelayedWorker)
     end
   end
+
+  describe 'delayed worker' do
+    context 'find the correct object and calls the correct method' do
+      context 'no args' do
+        it 'correct method' do
+          expect do
+            UserMailer.simple_delay.email1
+          end.to change(SidekiqSimpleDelay::SimpleDelayedMailer.jobs, :size).by(1)
+
+          expect(UserMailer).to receive(:trigger).with('hello')
+          Sidekiq::Worker.drain_all
+        end
+
+        it 'mail is sent' do
+          expect do
+            UserMailer.simple_delay.email1
+          end.to change(SidekiqSimpleDelay::SimpleDelayedMailer.jobs, :size).by(1)
+
+          expect_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver_now)
+          Sidekiq::Worker.drain_all
+        end
+      end
+
+      context '1 arg' do
+        it 'correct method' do
+          expect do
+            UserMailer.simple_delay.email2('things')
+          end.to change(SidekiqSimpleDelay::SimpleDelayedMailer.jobs, :size).by(1)
+
+          expect(UserMailer).to receive(:trigger).with('things')
+          Sidekiq::Worker.drain_all
+        end
+
+        it 'mail is sent' do
+          expect do
+            UserMailer.simple_delay.email2('things')
+          end.to change(SidekiqSimpleDelay::SimpleDelayedMailer.jobs, :size).by(1)
+
+          expect_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver_now)
+          Sidekiq::Worker.drain_all
+        end
+      end
+    end
+  end
 end
