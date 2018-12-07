@@ -6,9 +6,9 @@ module SidekiqSimpleDelay
   # Methods to enable simple_delay functionality to work with ActiveRecord
   module ActiveRecord
     def self.included(base)
-      base.extend(ClassMethods)
       base.include(SidekiqSimpleDelay::DelayMethods)
       base.extend(SidekiqSimpleDelay::DelayMethods)
+      base.extend(ClassMethods)
     end
 
     # Args required to fetch this object from the database

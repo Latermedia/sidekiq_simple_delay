@@ -5,3 +5,6 @@ bundle exec rspec spec --tag run_tag:enable_delay
 bundle exec rspec spec --tag run_tag:active_record_base
 bundle exec rspec spec --tag run_tag:application_record
 bundle exec rspec spec --tag run_tag:active_record_single
+bundle exec rspec spec --tag run_tag:action_mailer_base
+bundle exec rspec spec --tag run_tag:application_mailer
+bundle exec rspec spec --tag run_tag:action_mailer_single
