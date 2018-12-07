@@ -28,6 +28,12 @@ RSpec.describe SidekiqSimpleDelay, run_tag: :application_mailer do
       expect(UserMailer.respond_to?(:simple_delay_until)).to eq(true)
     end
 
+    it 'simple_delay_spread' do
+      expect(ActionMailer::Base.respond_to?(:simple_delay_spread)).to eq(false)
+      expect(ApplicationMailer.respond_to?(:simple_delay_spread)).to eq(true)
+      expect(UserMailer.respond_to?(:simple_delay_spread)).to eq(true)
+    end
+
     it 'mailer uses the correct delayed worker' do
       expect(UserMailer.simple_delayed_worker).to eq(SidekiqSimpleDelay::SimpleDelayedMailer)
     end

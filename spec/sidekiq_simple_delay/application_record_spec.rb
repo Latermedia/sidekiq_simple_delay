@@ -33,6 +33,13 @@ RSpec.describe SidekiqSimpleDelay, run_tag: :application_record do
       expect(Owner.respond_to?(:simple_delay_until)).to eq(true)
       expect(@owner.respond_to?(:simple_delay_until)).to eq(true)
     end
+
+    it 'simple_delay_spread' do
+      expect(ActiveRecord::Base.respond_to?(:simple_delay_spread)).to eq(false)
+      expect(ApplicationRecord.respond_to?(:simple_delay_spread)).to eq(true)
+      expect(Owner.respond_to?(:simple_delay_spread)).to eq(true)
+      expect(@owner.respond_to?(:simple_delay_spread)).to eq(true)
+    end
   end
 
   describe 'delayed worker' do

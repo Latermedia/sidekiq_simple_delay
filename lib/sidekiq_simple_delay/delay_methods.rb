@@ -32,11 +32,6 @@ module SidekiqSimpleDelay
       Proxy.new(simple_delayed_worker, self, options.merge('at' => timestamp.to_f))
     end
 
-    # Tell {DelayMethods} which delayed worker to use
-    def simple_delayed_worker
-      SimpleDelayedWorker
-    end
-
     # Enqueue a job to handle the delayed action in a given timeframe
     #
     # @param timestamp [#to_f] Timestamp to execute job at. `to_f` will be called on
@@ -104,6 +99,11 @@ module SidekiqSimpleDelay
         end
 
       Proxy.new(SimpleDelayedWorker, self, options.merge('at' => t))
+    end
+
+    # Tell {DelayMethods} which delayed worker to use
+    def simple_delayed_worker
+      SimpleDelayedWorker
     end
 
     alias simple_delay simple_sidekiq_delay

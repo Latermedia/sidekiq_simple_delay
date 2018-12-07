@@ -46,5 +46,16 @@ RSpec.describe SidekiqSimpleDelay, run_tag: :active_record_single do
       expect(Pet.respond_to?(:simple_delay_until)).to eq(false)
       expect(@pet.respond_to?(:simple_delay_until)).to eq(false)
     end
+
+    it 'simple_delay_spread' do
+      expect(ActiveRecord::Base.respond_to?(:simple_delay_spread)).to eq(false)
+      expect(ApplicationRecord.respond_to?(:simple_delay_spread)).to eq(false)
+
+      expect(Owner.respond_to?(:simple_delay_spread)).to eq(true)
+      expect(@owner.respond_to?(:simple_delay_spread)).to eq(true)
+
+      expect(Pet.respond_to?(:simple_delay_spread)).to eq(false)
+      expect(@pet.respond_to?(:simple_delay_spread)).to eq(false)
+    end
   end
 end
