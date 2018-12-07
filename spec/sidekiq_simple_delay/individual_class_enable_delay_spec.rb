@@ -54,5 +54,15 @@ RSpec.describe SidekiqSimpleDelay do
       expect(Klass1.respond_to?(:simple_delay_until)).to eq(false)
       expect(Klass1.new.respond_to?(:simple_delay_until)).to eq(false)
     end
+
+    it 'simple_delay_spread' do
+      [Klass2, Klass3, Klass4].each do |klass|
+        expect(klass.respond_to?(:simple_delay_spread)).to eq(true)
+        expect(klass.new.respond_to?(:simple_delay_spread)).to eq(true)
+      end
+
+      expect(Klass1.respond_to?(:simple_delay_spread)).to eq(false)
+      expect(Klass1.new.respond_to?(:simple_delay_spread)).to eq(false)
+    end
   end
 end

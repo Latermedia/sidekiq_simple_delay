@@ -65,8 +65,10 @@ RSpec.describe SidekiqSimpleDelay do
       Sidekiq::Worker.drain_all
     end
 
-    it 'enqueued job calls the class method' do
-      ClassMethodTest.simple_delay.method1
+    it 'enqueue simple_delay_spread' do
+      expect do
+        ClassMethodTest.simple_delay_spread.method1
+      end.to change(SidekiqSimpleDelay::SimpleDelayedWorker.jobs, :size).by(1)
 
       expect(ClassMethodTest).to receive(:trigger)
       Sidekiq::Worker.drain_all

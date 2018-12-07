@@ -30,6 +30,7 @@ module SidekiqSimpleDelay
           Set.new([Fixnum, Bignum, Float]).freeze
         end
 
+      # @private
       def simple_object?(obj)
         klass = obj.class
 
@@ -41,6 +42,27 @@ module SidekiqSimpleDelay
           true
         else
           false
+        end
+      end
+
+      # @private
+      def extract_option(opts, arg, default = nil)
+        [arg.to_sym, arg.to_s].each do |a|
+          next unless opts.key?(a)
+
+          return opts.delete(a)
+        end
+
+        default
+      end
+
+      if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.3.0')
+        def random_number(duration)
+          SecureRandom.random_number(duration)
+        end
+      else
+        def random_number(duration)
+          rand * duration
         end
       end
     end

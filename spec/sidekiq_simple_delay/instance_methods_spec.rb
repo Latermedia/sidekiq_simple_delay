@@ -122,6 +122,15 @@ class Actor
   end
 end
 
+def stub_proxy(obj, opts, method)
+  proxy = SidekiqSimpleDelay::Proxy
+  worker = SidekiqSimpleDelay::SimpleDelayedWorker
+
+  retval = double(method => true)
+
+  expect(proxy).to receive(:new).with(worker, obj, opts).and_return(retval)
+end
+
 RSpec.describe SidekiqSimpleDelay do
   before(:all) do
     # SidekiqSimpleDelay.enable_delay_instance!(Klass2)
@@ -160,6 +169,15 @@ RSpec.describe SidekiqSimpleDelay do
       it 'enqueue simple_delay_until' do
         expect do
           ValidSimpleObject.new.simple_delay_until(1.day.from_now).method1
+        end.to change(SidekiqSimpleDelay::SimpleDelayedWorker.jobs, :size).by(1)
+
+        expect(ValidSimpleObject).to receive(:trigger).with(nil)
+        Sidekiq::Worker.drain_all
+      end
+
+      it 'enqueue simple_delay_spread' do
+        expect do
+          ValidSimpleObject.new.simple_delay_spread.method1
         end.to change(SidekiqSimpleDelay::SimpleDelayedWorker.jobs, :size).by(1)
 
         expect(ValidSimpleObject).to receive(:trigger).with(nil)
@@ -257,6 +275,173 @@ RSpec.describe SidekiqSimpleDelay do
         it 'method with keyword arg should raise' do
           expect do
             @actor.simple_delay.method4('things', arg2: 'things')
+          end.to raise_exception(::ArgumentError)
+        end
+      end
+    end
+
+    context 'simple_delay_spread' do
+      before(:each) do
+        time_str = '2018-12-03 16:03:28 -0800'
+        @time_f = 1_543_881_808.0
+
+        allow(Time).to receive(:now).and_return(Time.parse(time_str))
+      end
+
+      it 'should enqueue immediately - 0 duration' do
+        obj = ValidSimpleObject.new
+
+        proxy_opts = {
+          'at' => @time_f
+        }
+        stub_proxy(obj, proxy_opts, :method1)
+
+        opts = {
+          spread_duration: 0
+        }
+        obj.simple_delay_spread(opts).method1
+      end
+
+      it 'should enqueue immediately - neg duration' do
+        obj = ValidSimpleObject.new
+
+        proxy_opts = {
+          'at' => @time_f
+        }
+        stub_proxy(obj, proxy_opts, :method1)
+
+        opts = {
+          spread_duration: -10
+        }
+        obj.simple_delay_spread(opts).method1
+      end
+
+      context 'rand' do
+        before(:each) do
+          @rand_val = 5
+          allow(SidekiqSimpleDelay::Utils).to receive(:random_number).and_return(@rand_val)
+        end
+
+        it 'should enqueue within the next hour' do
+          obj = ValidSimpleObject.new
+
+          proxy_opts = {
+            'at' => @time_f + @rand_val
+          }
+          stub_proxy(obj, proxy_opts, :method1)
+
+          obj.simple_delay_spread.method1
+        end
+
+        it 'should enqueue within the next hour + 3 hours' do
+          obj = ValidSimpleObject.new
+
+          proxy_opts = {
+            'at' => @time_f + @rand_val + 3.hours.to_f
+          }
+          stub_proxy(obj, proxy_opts, :method1)
+
+          opts = {
+            spread_in: 3.hours
+          }
+
+          obj.simple_delay_spread(opts).method1
+        end
+
+        it 'should enqueue within the next hour of give time' do
+          obj = ValidSimpleObject.new
+
+          t = Time.parse('Thu, 06 Dec 2018 16:47:58 PST -08:00')
+
+          proxy_opts = {
+            'at' => t.to_f + @rand_val
+          }
+          stub_proxy(obj, proxy_opts, :method1)
+
+          opts = {
+            spread_at: t
+          }
+
+          obj.simple_delay_spread(opts).method1
+        end
+      end
+
+      context 'mod' do
+        it 'should enqueue a job based on mod_value' do
+          obj = ValidSimpleObject.new
+
+          proxy_opts = {
+            'at' => @time_f + 1545.0
+          }
+          stub_proxy(obj, proxy_opts, :method1)
+
+          opts = {
+            spread_method: :mod,
+            spread_mod_value: 12_345
+          }
+
+          obj.simple_delay_spread(opts).method1
+        end
+
+        it 'should enqueue a job based on spread_mod_method' do
+          obj = ValidSimpleObject.new
+
+          allow(obj).to receive(:get_my_mod_value).and_return(54_321)
+
+          proxy_opts = {
+            'at' => @time_f + 321.0
+          }
+          stub_proxy(obj, proxy_opts, :method1)
+
+          opts = {
+            spread_method: :mod,
+            spread_mod_method: :get_my_mod_value
+          }
+
+          obj.simple_delay_spread(opts).method1
+        end
+
+        it 'should enqueue a job based on spread_mod_method method' do
+          obj = ValidSimpleObject.new
+
+          allow(obj).to receive(:get_my_mod_value).and_return(654_321)
+          allow(obj).to receive(:spread_mod_method).and_return(:get_my_mod_value)
+
+          proxy_opts = {
+            'at' => @time_f + 2721.0
+          }
+          stub_proxy(obj, proxy_opts, :method1)
+
+          opts = {
+            spread_method: :mod
+          }
+
+          obj.simple_delay_spread(opts).method1
+        end
+
+        it 'should raise when we cannot find a mod_value' do
+          obj = ValidSimpleObject.new
+
+          opts = {
+            spread_method: :mod
+          }
+
+          expect do
+            obj.simple_delay_spread(opts).method1
+          end.to raise_exception(::ArgumentError)
+        end
+      end
+
+      context 'bad spread_method' do
+        it 'should raise on bad spread_method' do
+          obj = ValidSimpleObject.new
+
+          opts = {
+            spread_method: :not_valid
+          }
+
+          expect do
+            obj.simple_delay_spread(opts).method1
           end.to raise_exception(::ArgumentError)
         end
       end
