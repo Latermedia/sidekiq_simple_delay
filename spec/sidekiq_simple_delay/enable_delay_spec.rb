@@ -5,7 +5,7 @@ require 'spec_helper'
 class ClassDelayTest
 end
 
-RSpec.describe SidekiqSimpleDelay, enable_delay: true do
+RSpec.describe SidekiqSimpleDelay, run_tag: :enable_delay do
   before(:all) do
     SidekiqSimpleDelay.enable_delay!
   end
