@@ -368,27 +368,27 @@ RSpec.describe SidekiqSimpleDelay do
         it 'should enqueue two jobs' do
           obj = ValidSimpleObject.new
 
-          rand_val_1 = 20_000
-          rand_val_2 = 15_500
+          rand_val1 = 20_000
+          rand_val2 = 15_500
           duration = 6.hours
 
-          expect(SidekiqSimpleDelay::Utils).to receive(:random_number).and_return(rand_val_1, rand_val_2)
+          expect(SidekiqSimpleDelay::Utils).to receive(:random_number).and_return(rand_val1, rand_val2)
           expect(SidekiqSimpleDelay::Utils).to_not receive(:random_number).with(1.hour)
 
           opts = {
             spread_duration: duration
           }
 
-          proxy_opts_1 = {
-            'at' => @time_f + rand_val_1
+          proxy_opts1 = {
+            'at' => @time_f + rand_val1
           }
-          stub_proxy(obj, proxy_opts_1, :method1)
+          stub_proxy(obj, proxy_opts1, :method1)
           obj.simple_delay_spread(opts).method1
 
-          proxy_opts_2 = {
-            'at' => @time_f + rand_val_2
+          proxy_opts2 = {
+            'at' => @time_f + rand_val2
           }
-          stub_proxy(obj, proxy_opts_2, :method2)
+          stub_proxy(obj, proxy_opts2, :method2)
           obj.simple_delay_spread(opts).method2
         end
       end
