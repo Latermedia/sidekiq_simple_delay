@@ -46,12 +46,14 @@ module SidekiqSimpleDelay
     # @option options [Symbol] :spread_mod_method method to call to get the value to use
     #   for determining mod offset
     def simple_sidekiq_delay_spread(options = {})
-      spread_duration = Utils.extract_option(options, :spread_duration, 1.hour).to_f
-      spread_in = Utils.extract_option(options, :spread_in, 0).to_f
-      spread_at = Utils.extract_option(options, :spread_at)
-      spread_method = Utils.extract_option(options, :spread_method, :rand)
-      spread_mod_value = Utils.extract_option(options, :spread_mod_value)
-      spread_mod_method = Utils.extract_option(options, :spread_mod_method)
+      local_opts = options.dup
+
+      spread_duration = Utils.extract_option(local_opts, :spread_duration, 1.hour).to_f
+      spread_in = Utils.extract_option(local_opts, :spread_in, 0).to_f
+      spread_at = Utils.extract_option(local_opts, :spread_at)
+      spread_method = Utils.extract_option(local_opts, :spread_method, :rand)
+      spread_mod_value = Utils.extract_option(local_opts, :spread_mod_value)
+      spread_mod_method = Utils.extract_option(local_opts, :spread_mod_method)
 
       spread_duration = 0 if spread_duration < 0
       spread_in = 0 if spread_in < 0
@@ -98,7 +100,7 @@ module SidekiqSimpleDelay
           Time.now.to_f + spread
         end
 
-      Proxy.new(SimpleDelayedWorker, self, options.merge('at' => t))
+      Proxy.new(SimpleDelayedWorker, self, local_opts.merge('at' => t))
     end
 
     # Tell {DelayMethods} which delayed worker to use
