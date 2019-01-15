@@ -1,3 +1,7 @@
+# master
+
+* fix options handling for `simple_delay_spread`
+
 # 0.2.0
 
 * `simple_delay_spread`
