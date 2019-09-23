@@ -18,16 +18,27 @@ module SidekiqSimpleDelay
       }
 
       # check to make sure there are no keyword or block args
-      method_args_sig = @target.method(name).parameters
+      num_req_key_args = 0
+      num_opt_key_args = 0
+      num_var_key_args = 0
+      num_block_args = 0
 
-      num_req_key_args = method_args_sig.count { |p| p[0] == :keyreq }
-      num_opt_key_args = method_args_sig.count { |p| p[0] == :key }
-      num_var_key_args = method_args_sig.count { |p| p[0] == :keyrest }
+      @target.method(name).parameters.each do |param|
+        case param[0]
+        when :keyreq
+          num_req_key_args += 1
+        when :key
+          num_opt_key_args += 1
+        when :keyrest
+          num_var_key_args += 1
+        when :block
+          num_block_args += 1
+        end
+      end
 
       uses_keyword_args = num_req_key_args > 0 || num_opt_key_args > 0 || num_var_key_args > 0
       raise ArgumentError, 'Cannot delay methods with named arguments' if uses_keyword_args
 
-      num_block_args = method_args_sig.select { |p| p[0] == :block }.length
       raise ArgumentError, 'Cannot delay methods with named block argument' if num_block_args > 0
 
       # Calling class methods is always permitted
@@ -55,7 +66,20 @@ module SidekiqSimpleDelay
       # the args have to be simple and convertable to JSON
       raise ArgumentError, 'args are not serializable, cannot use simple_delay' unless Utils.simple_object?(worker_args)
 
-      @performable.client_push({ 'class' => @performable, 'args' => [worker_args] }.merge(@opts))
+      wrapped =
+        if @target.is_a?(Class)
+          "SimpleDelayed=#{worker_args['target_klass']}::#{worker_args['m']}"
+        else
+          "SimpleDelayed=#{worker_args['target_klass']}##{worker_args['m']}"
+        end
+
+      push_args =
+        {
+          'class' => @performable,
+          'args' => [worker_args],
+          'wrapped' => wrapped
+        }.merge(@opts)
+      @performable.client_push(push_args)
     end
   end
 end

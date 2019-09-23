@@ -153,6 +153,9 @@ RSpec.describe SidekiqSimpleDelay do
           ValidSimpleObject.new.simple_delay.method1
         end.to change(SidekiqSimpleDelay::SimpleDelayedWorker.jobs, :size).by(1)
 
+        job = SidekiqSimpleDelay::SimpleDelayedWorker.jobs.first
+        expect(job['wrapped']).to eq('SimpleDelayed=ValidSimpleObject#method1')
+
         expect(ValidSimpleObject).to receive(:trigger).with(nil)
         Sidekiq::Worker.drain_all
       end

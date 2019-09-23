@@ -43,6 +43,9 @@ RSpec.describe SidekiqSimpleDelay do
         ClassMethodTest.simple_delay.method1
       end.to change(SidekiqSimpleDelay::SimpleDelayedWorker.jobs, :size).by(1)
 
+      job = SidekiqSimpleDelay::SimpleDelayedWorker.jobs.first
+      expect(job['wrapped']).to eq('SimpleDelayed=ClassMethodTest::method1')
+
       expect(ClassMethodTest).to receive(:trigger)
       Sidekiq::Worker.drain_all
     end

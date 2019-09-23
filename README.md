@@ -218,6 +218,18 @@ By modding on the id of the `User` object, we can be sure that if we run this sc
 
 In addition requiring arguments being simple, a requirement of no keyword or block arguments is imposed. There is a chance the keyword argument restriction could be lifted, but this would take a fair bit of work in `SimpleDelayedWorker` to get working correctly. For now the restriction is there to keep one from shooting themselves in the foot.
 
+## Logging
+
+`sidekiq_simple_delay` hijacks the `wrapped` job parameter used by `ActiveJob` to log the class and method name being used. The logged "class" will look something like:
+
+Class method:
+
+`SimpleDelayed=MyClass::class_meethod`
+
+Instance method:
+
+`SimpleDelayed=MyClass#instance_meethod`
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
