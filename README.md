@@ -247,10 +247,10 @@ To run the tests:
 ```
 
 Tests are currently run against the following Ruby version:
+- 2.6
 - 2.5
 - 2.4
 - 2.3
-- 2.2
 
 ## Contributing
 
