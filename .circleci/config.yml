@@ -130,6 +130,11 @@ jobs:
           name: Rubocop
           command: bundle exec rubocop
 
+  ruby-2.6:
+    <<: *spec_shared
+    docker:
+      - image: circleci/ruby:2.6
+
   ruby-2.5:
     <<: *spec_shared
     docker:
@@ -144,11 +149,6 @@ jobs:
     <<: *spec_shared
     docker:
       - image: circleci/ruby:2.3
-
-  ruby-2.2:
-    <<: *spec_shared
-    docker:
-      - image: circleci/ruby:2.2
 
   generate_docs:
     docker:
@@ -187,6 +187,9 @@ workflows:
   build:
     jobs:
       - deps
+      - ruby-2.6:
+          requires:
+            - deps
       - ruby-2.5:
           requires:
             - deps
@@ -196,12 +199,9 @@ workflows:
       - ruby-2.3:
           requires:
             - deps
-      - ruby-2.2:
-          requires:
-            - deps
       - generate_docs:
           requires:
+            - ruby-2.6
             - ruby-2.5
             - ruby-2.4
             - ruby-2.3
-            - ruby-2.2
