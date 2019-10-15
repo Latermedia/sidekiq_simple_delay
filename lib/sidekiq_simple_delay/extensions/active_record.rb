@@ -21,6 +21,8 @@ module SidekiqSimpleDelay
       # Take delay worker args and fetch record from database
       def simple_delay_initialize(*args)
         find(args[0])
+      rescue ::ActiveRecord::RecordNotFound
+        nil
       end
     end
   end
