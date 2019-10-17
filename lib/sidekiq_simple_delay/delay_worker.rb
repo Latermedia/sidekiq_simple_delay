@@ -13,7 +13,7 @@ module SidekiqSimpleDelay
       target =
         if args.key?('init_args')
           if target_klass.respond_to?(:simple_delay_initialize)
-            target_klass.simple_delay_initialize(*args['init_args'])
+            target_klass.simple_delay_initialize(*args['init_args']) || return
           else
             target_klass.new(*args['init_args'])
           end

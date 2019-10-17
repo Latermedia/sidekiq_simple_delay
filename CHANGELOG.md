@@ -1,3 +1,8 @@
+# HEAD
+
+* change simple_delay_initialize to return safely
+* instead of raising an error if the instance cannot be found
+
 # 0.2.1
 
 * fix options handling for `simple_delay_spread`
